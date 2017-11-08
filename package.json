@@ -1,16 +1,13 @@
 {
   "name": "migrate-mongoose",
-  "version": "3.2.2",
+  "version": "3.2.3",
   "description": "A mongoose based migration framework for node",
   "main": "./dist/lib.js",
   "scripts": {
-    "prepublish": "scripts/prepublish.sh",
-    "postpublish": "rm -r ./dist",
-    "postversion": "git push && git push --tags",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "./node_modules/.bin/babel -d dist/ src/"
   },
   "bin": {
-    "migrate": "./dist/cli.js"
+    "migrate": "./bin/migrate"
   },
   "keywords": [
     "migrate",
@@ -26,17 +23,17 @@
     "url": "https://github.com/balmasi/migrate-mongoose.git"
   },
   "dependencies": {
-    "babel-cli": "^6.18.0",
-    "babel-core": "^6.20.0",
-    "babel-plugin-transform-runtime": "^6.15.0",
-    "babel-polyfill": "^6.20.0",
-    "babel-preset-latest": "^6.16.0",
-    "babel-register": "^6.18.0",
-    "bluebird": "^3.3.3",
+    "bluebird": "^3.5.0",
     "colors": "^1.1.2",
     "inquirer": "^0.12.0",
     "mkdirp": "^0.5.1",
-    "mongoose": "^4.4.6",
+    "mongoose": "^4.10.2",
     "yargs": "^4.8.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.6.1"
   }
 }

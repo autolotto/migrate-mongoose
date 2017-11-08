@@ -16,56 +16,34 @@ Promise.config({
 
 const es6Template =
 `
-/**
- * Make any changes you need to make to the database here
- */
-export async function up () {
-  // Write migration here
+async function up () {
+
 }
 
-/**
- * Make any changes that UNDO the up function side effects here (if possible)
- */
-export async function down () {
-  // Write migration here
+async function down () {
+
 }
-`;
 
-const es5Template =
-`'use strict';
-
-/**
- * Make any changes you need to make to the database here
- */
-exports.up = function up (done) {
-  done();
-};
-
-/**
- * Make any changes that UNDO the up function side effects here (if possible)
- */
-exports.down = function down(done) {
-  done();
+module.exports = {
+  up,
+  down
 };
 `;
-
 
 export default class Migrator {
   constructor({
     templatePath,
     migrationsPath = './migrations',
     dbConnectionUri,
-    es6Templates = false,
     collectionName = 'migrations',
     autosync = false,
     cli = false,
     connection
   }) {
-    const defaultTemplate = es6Templates ?  es6Template : es5Template;
+    const defaultTemplate = es6Template;
     this.template = templatePath ? fs.readFileSync(templatePath, 'utf-8') : defaultTemplate;
     this.migrationPath = path.resolve(migrationsPath);
-    this.connection = connection || mongoose.createConnection(dbConnectionUri);
-    this.es6 = es6Templates;
+    this.connection = connection || mongoose.connect(dbConnectionUri, { useMongoClient: true });
     this.collection = collectionName;
     this.autosync = autosync;
     this.cli = cli;
@@ -134,9 +112,13 @@ export default class Migrator {
   async run(direction = 'up', migrationName) {
     await this.sync();
 
+    if (direction !== 'up' && direction !== 'down') {
+      throw new Error(`The '${direction}' is not supported, use the 'up' or 'down' direction`);
+    }
+
     const untilMigration = migrationName ?
-      await MigrationModel.findOne({name: migrationName}) :
-      await MigrationModel.findOne().sort({createdAt: -1});
+      await MigrationModel.findOne({ name: migrationName }) :
+      await MigrationModel.findOne().sort({ createdAt: direction === 'up' ? -1 : 1 });
 
     if (!untilMigration) {
       if (migrationName) throw new ReferenceError("Could not find that migration in the database");
@@ -155,7 +137,6 @@ export default class Migrator {
       };
     }
 
-
     const sortDirection = direction == 'up' ? 1 : -1;
     const migrationsToRun = await MigrationModel.find(query)
       .sort({createdAt: sortDirection});
@@ -165,6 +146,7 @@ export default class Migrator {
         this.log('There are no migrations to run'.yellow);
         this.log(`Current Migrations' Statuses: `);
         await this.list();
+        return [];
       }
       throw new Error('There are no migrations to run');
     }
@@ -175,22 +157,13 @@ export default class Migrator {
 
     for (const migration of migrationsToRun) {
       const migrationFilePath = path.join(self.migrationPath, migration.filename);
-      if (this.es6) {
-        require('babel-register')({
-          "presets": [require("babel-preset-latest")],
-          "plugins": [require("babel-plugin-transform-runtime")]
-        });
-
-        require('babel-polyfill');
-      }
-
       let migrationFunctions;
 
       try {
         migrationFunctions = require(migrationFilePath);
       } catch (err) {
         err.message = err.message && /Unexpected token/.test(err.message) ?
-          'Unexpected Token when parsing migration. If you are using an ES6 migration file, use option --es6' :
+          'Unexpected Token when parsing migration.' :
           err.message;
         throw err;
       }
