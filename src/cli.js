@@ -91,6 +91,11 @@ let  { argv: args } = yargs
     description: 'Automatically add new migrations in the migrations folder to the database instead of asking interactively'
   })
 
+  .option('enable', {
+    type: 'boolean',
+    description: 'Set to false if you want to do a dry run'
+  })
+
   .help('h')
   .alias('h', 'help');
 
@@ -115,6 +120,7 @@ let migrator = new Migrator({
   es6Templates: args.es6,
   collectionName:  args.collection,
   autosync: args.autosync,
+  enable: args.enable,
   cli: true
 });
 

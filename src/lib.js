@@ -37,6 +37,7 @@ export default class Migrator {
     dbConnectionUri,
     collectionName = 'migrations',
     autosync = false,
+    enable = true,
     cli = false,
     connection
   }) {
@@ -46,6 +47,7 @@ export default class Migrator {
     this.connection = connection || mongoose.connect(dbConnectionUri, { useMongoClient: true });
     this.collection = collectionName;
     this.autosync = autosync;
+    this.enable = enable;
     this.cli = cli;
     MigrationModel = MigrationModelFactory(collectionName, this.connection);
   }
@@ -110,6 +112,7 @@ export default class Migrator {
    * @param direction
    */
   async run(direction = 'up', migrationName) {
+    if (!this.enable) return [];
     await this.sync();
 
     if (direction !== 'up' && direction !== 'down') {

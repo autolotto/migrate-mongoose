@@ -74,6 +74,9 @@ var _yargs$usage$demand$d = _yargs2.default.usage("Usage: migrate -d <mongo-uri>
 }).option('autosync', {
   type: 'boolean',
   description: 'Automatically add new migrations in the migrations folder to the database instead of asking interactively'
+}).option('enable', {
+  type: 'boolean',
+  description: 'Set to false if you want to do a dry run'
 }).help('h').alias('h', 'help'),
     args = _yargs$usage$demand$d.argv;
 
@@ -103,6 +106,7 @@ var migrator = new _lib2.default({
   es6Templates: args.es6,
   collectionName: args.collection,
   autosync: args.autosync,
+  enable: args.enable,
   cli: true
 });
 

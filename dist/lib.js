@@ -74,6 +74,8 @@ var Migrator = function () {
         collectionName = _ref$collectionName === undefined ? 'migrations' : _ref$collectionName,
         _ref$autosync = _ref.autosync,
         autosync = _ref$autosync === undefined ? false : _ref$autosync,
+        _ref$enable = _ref.enable,
+        enable = _ref$enable === undefined ? true : _ref$enable,
         _ref$cli = _ref.cli,
         cli = _ref$cli === undefined ? false : _ref$cli,
         connection = _ref.connection;
@@ -85,6 +87,7 @@ var Migrator = function () {
     this.connection = connection || _mongoose2.default.connect(dbConnectionUri, { useMongoClient: true });
     this.collection = collectionName;
     this.autosync = autosync;
+    this.enable = enable;
     this.cli = cli;
     MigrationModel = (0, _db2.default)(collectionName, this.connection);
   }
@@ -221,57 +224,65 @@ var Migrator = function () {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                _context3.next = 2;
-                return this.sync();
+                if (this.enable) {
+                  _context3.next = 2;
+                  break;
+                }
+
+                return _context3.abrupt('return', []);
 
               case 2:
+                _context3.next = 4;
+                return this.sync();
+
+              case 4:
                 if (!(direction !== 'up' && direction !== 'down')) {
-                  _context3.next = 4;
+                  _context3.next = 6;
                   break;
                 }
 
                 throw new Error('The \'' + direction + '\' is not supported, use the \'up\' or \'down\' direction');
 
-              case 4:
+              case 6:
                 if (!migrationName) {
-                  _context3.next = 10;
+                  _context3.next = 12;
                   break;
                 }
 
-                _context3.next = 7;
+                _context3.next = 9;
                 return MigrationModel.findOne({ name: migrationName });
 
-              case 7:
+              case 9:
                 _context3.t0 = _context3.sent;
-                _context3.next = 13;
+                _context3.next = 15;
                 break;
 
-              case 10:
-                _context3.next = 12;
+              case 12:
+                _context3.next = 14;
                 return MigrationModel.findOne().sort({ createdAt: direction === 'up' ? -1 : 1 });
 
-              case 12:
+              case 14:
                 _context3.t0 = _context3.sent;
 
-              case 13:
+              case 15:
                 untilMigration = _context3.t0;
 
                 if (untilMigration) {
-                  _context3.next = 20;
+                  _context3.next = 22;
                   break;
                 }
 
                 if (!migrationName) {
-                  _context3.next = 19;
+                  _context3.next = 21;
                   break;
                 }
 
                 throw new ReferenceError("Could not find that migration in the database");
 
-              case 19:
+              case 21:
                 throw new Error("There are no pending migrations.");
 
-              case 20:
+              case 22:
                 query = {
                   createdAt: { $lte: untilMigration.createdAt },
                   state: 'down'
@@ -286,34 +297,34 @@ var Migrator = function () {
                 }
 
                 sortDirection = direction == 'up' ? 1 : -1;
-                _context3.next = 25;
+                _context3.next = 27;
                 return MigrationModel.find(query).sort({ createdAt: sortDirection });
 
-              case 25:
+              case 27:
                 migrationsToRun = _context3.sent;
 
                 if (migrationsToRun.length) {
-                  _context3.next = 34;
+                  _context3.next = 36;
                   break;
                 }
 
                 if (!this.cli) {
-                  _context3.next = 33;
+                  _context3.next = 35;
                   break;
                 }
 
                 this.log('There are no migrations to run'.yellow);
                 this.log('Current Migrations\' Statuses: ');
-                _context3.next = 32;
+                _context3.next = 34;
                 return this.list();
 
-              case 32:
+              case 34:
                 return _context3.abrupt('return', []);
 
-              case 33:
+              case 35:
                 throw new Error('There are no migrations to run');
 
-              case 34:
+              case 36:
                 self = this;
                 numMigrationsRan = 0;
                 migrationsRan = [];
@@ -391,68 +402,68 @@ var Migrator = function () {
                 _iteratorNormalCompletion = true;
                 _didIteratorError = false;
                 _iteratorError = undefined;
-                _context3.prev = 41;
+                _context3.prev = 43;
                 _iterator = migrationsToRun[Symbol.iterator]();
 
-              case 43:
+              case 45:
                 if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
-                  _context3.next = 49;
+                  _context3.next = 51;
                   break;
                 }
 
                 migration = _step.value;
-                return _context3.delegateYield(_loop(migration), 't1', 46);
+                return _context3.delegateYield(_loop(migration), 't1', 48);
 
-              case 46:
+              case 48:
                 _iteratorNormalCompletion = true;
-                _context3.next = 43;
-                break;
-
-              case 49:
-                _context3.next = 55;
+                _context3.next = 45;
                 break;
 
               case 51:
-                _context3.prev = 51;
-                _context3.t2 = _context3['catch'](41);
+                _context3.next = 57;
+                break;
+
+              case 53:
+                _context3.prev = 53;
+                _context3.t2 = _context3['catch'](43);
                 _didIteratorError = true;
                 _iteratorError = _context3.t2;
 
-              case 55:
-                _context3.prev = 55;
-                _context3.prev = 56;
+              case 57:
+                _context3.prev = 57;
+                _context3.prev = 58;
 
                 if (!_iteratorNormalCompletion && _iterator.return) {
                   _iterator.return();
                 }
 
-              case 58:
-                _context3.prev = 58;
+              case 60:
+                _context3.prev = 60;
 
                 if (!_didIteratorError) {
-                  _context3.next = 61;
+                  _context3.next = 63;
                   break;
                 }
 
                 throw _iteratorError;
 
-              case 61:
-                return _context3.finish(58);
-
-              case 62:
-                return _context3.finish(55);
-
               case 63:
+                return _context3.finish(60);
+
+              case 64:
+                return _context3.finish(57);
+
+              case 65:
 
                 if (migrationsToRun.length == numMigrationsRan) this.log('All migrations finished successfully.'.green);
                 return _context3.abrupt('return', migrationsRan);
 
-              case 65:
+              case 67:
               case 'end':
                 return _context3.stop();
             }
           }
-        }, _callee2, this, [[41, 51, 55, 63], [56,, 58, 62]]);
+        }, _callee2, this, [[43, 53, 57, 65], [58,, 60, 64]]);
       }));
 
       function run() {
