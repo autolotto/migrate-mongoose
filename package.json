@@ -1,6 +1,6 @@
 {
   "name": "@autolotto/migrate-mongoose",
-  "version": "3.3.0",
+  "version": "3.3.1",
   "description": "A mongoose based migration framework for node",
   "main": "./dist/lib.js",
   "scripts": {
