@@ -1,7 +1,7 @@
 ### Example of using the library programmatically
 
 ```javascript
-var migrateMongoose = require('migrate-mongoose');
+var migrateMongoose = require('@autolotto/migrate-mongoose');
 
 // Define all your variables
 var 

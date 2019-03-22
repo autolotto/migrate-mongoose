@@ -24,7 +24,7 @@ migrate-mongoose is a migration framework for projects which are already using m
 ### Getting Started
 You can install it locally in your project
 ```
- npm install migrate-mongoose
+ npm install @autolotto/migrate-mongoose
 ```
 and then run
 ```
@@ -35,7 +35,7 @@ and then run
 
 Install it globally
 ```
- npm install -g migrate-mongoose
+ npm install -g @autolotto/migrate-mongoose
 ```
 and then run
 ```
